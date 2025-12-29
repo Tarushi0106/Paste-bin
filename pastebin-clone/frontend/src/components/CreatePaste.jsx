@@ -95,7 +95,7 @@ const CreatePaste = () => {
   return (
     <Box className="fade-in">
       <Typography variant="h4" gutterBottom color="primary">
-        ✨ Create New Paste
+         Create New Paste
       </Typography>
       
       <Grid container spacing={3}>

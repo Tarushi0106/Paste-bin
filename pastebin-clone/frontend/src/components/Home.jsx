@@ -1,3 +1,4 @@
+// frontend/src/components/Home.js
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -26,6 +27,7 @@ import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_URL;
 console.log("API_URL =", API_URL);
+
 const Home = () => {
   const [recentPastes, setRecentPastes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -63,7 +65,6 @@ const Home = () => {
   const copyToClipboard = (id) => {
     const url = `${window.location.origin}/paste/${id}`;
     navigator.clipboard.writeText(url);
-    // You could add a toast notification here
   };
 
   return (
@@ -102,7 +103,7 @@ const Home = () => {
       )}
 
       <Typography variant="h5" sx={{ mb: 3, color: 'primary.main' }}>
-        📝 Recent Pastes
+         Recent Pastes
       </Typography>
 
       {loading ? (

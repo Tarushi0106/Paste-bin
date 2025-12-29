@@ -1,7 +1,9 @@
+// index.js
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import './styles.css'; // Import CSS here
 import App from './App';
-import './index.css';
+import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -9,3 +11,5 @@ root.render(
     <App />
   </React.StrictMode>
 );
+
+reportWebVitals();
