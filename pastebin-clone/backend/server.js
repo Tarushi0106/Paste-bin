@@ -21,7 +21,8 @@ app.options("*", cors());
 
 app.use(express.json());
 
-app.use("/api", pasteRoutes);
+app.use("/api/pastes", pasteRoutes);
+
 
 app.get("/api/healthz", async (req, res) => {
   try {
