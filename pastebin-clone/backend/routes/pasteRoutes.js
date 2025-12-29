@@ -6,42 +6,37 @@ const { randomUUID } = require("crypto");
 let pastes = [];
 
 // Create a new paste
-router.post("/pastes", (req, res) => {
-  const { title, content, language } = req.body;
+router.post("/pastes", async (req, res) => {
+  const { content, ttl_seconds, max_views } = req.body;
 
-  if (!content) {
-    return res.status(400).json({
-      success: false,
-      message: "Content is required"
-    });
+  if (!content || typeof content !== "string" || !content.trim()) {
+    return res.status(400).json({ error: "Invalid content" });
   }
 
-  const paste = {
-    _id: randomUUID(),
-    title: title || "Untitled",
+  if (ttl_seconds !== undefined && (!Number.isInteger(ttl_seconds) || ttl_seconds < 1)) {
+    return res.status(400).json({ error: "Invalid ttl_seconds" });
+  }
+
+  if (max_views !== undefined && (!Number.isInteger(max_views) || max_views < 1)) {
+    return res.status(400).json({ error: "Invalid max_views" });
+  }
+
+  const expiresAt = ttl_seconds
+    ? new Date(Date.now() + ttl_seconds * 1000)
+    : null;
+
+  const paste = await Paste.create({
     content,
-    language: language || "text",
-    views: 0,
-    createdAt: new Date(),
-    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-  };
+    expiresAt,
+    maxViews: max_views ?? null,
+  });
 
-  pastes.unshift(paste);
-
- 
-const baseUrl =
-  process.env.NODE_ENV === "production"
-    ? "https://paste-bin-ploi.vercel.app"
-    : "http://localhost:3000";
-
-res.status(201).json({
-  success: true,
-  data: paste,
-  url: `${baseUrl}/paste/${paste._id}`
+  res.status(201).json({
+    id: paste._id.toString(),
+    url: `${process.env.PUBLIC_BASE_URL}/p/${paste._id}`
+  });
 });
 
-
-  });
 
 
 // Get recent pastes
@@ -59,22 +54,30 @@ router.get("/pastes", (req, res) => {
 });
 
 // Get paste by ID
-router.get("/pastes/:id", (req, res) => {
-  const paste = pastes.find(p => p._id === req.params.id);
+router.get("/pastes/:id", async (req, res) => {
+  const paste = await Paste.findById(req.params.id);
+  if (!paste) return res.status(404).json({ error: "Not found" });
 
-  if (!paste) {
-    return res.status(404).json({
-      success: false,
-      message: "Paste not found"
-    });
+  const currentTime = now(req);
+
+  if (paste.expiresAt && currentTime > paste.expiresAt.getTime()) {
+    return res.status(404).json({ error: "Expired" });
   }
 
-  paste.views += 1;
+  if (paste.maxViews !== null && paste.viewsUsed >= paste.maxViews) {
+    return res.status(404).json({ error: "View limit exceeded" });
+  }
+
+  paste.viewsUsed += 1;
+  await paste.save();
 
   res.json({
-    success: true,
-    data: paste
+    content: paste.content,
+    remaining_views:
+      paste.maxViews === null ? null : paste.maxViews - paste.viewsUsed,
+    expires_at: paste.expiresAt
   });
 });
+
 
 module.exports = router;

@@ -32,11 +32,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api", pasteRoutes);
 
 // Health check
-app.get("/health", (req, res) => {
-  res.json({
-    status: "OK",
-    timestamp: new Date().toISOString()
-  });
+
+app.get("/api/healthz", async (req, res) => {
+  try {
+    await mongoose.connection.db.admin().ping();
+    res.status(200).json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ ok: false });
+  }
 });
 
 /* =======================
@@ -61,6 +64,34 @@ mongoose
     process.exit(1);
   });
 
+
+
+  const escapeHtml = (str) =>
+  str.replace(/[&<>"']/g, (m) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m])
+  );
+
+app.get("/p/:id", async (req, res) => {
+  const paste = await Paste.findById(req.params.id);
+  if (!paste) return res.status(404).send("Not Found");
+
+  const currentTime = now(req);
+
+  if (paste.expiresAt && currentTime > paste.expiresAt.getTime()) {
+    return res.status(404).send("Not Found");
+  }
+
+  if (paste.maxViews !== null && paste.viewsUsed >= paste.maxViews) {
+    return res.status(404).send("Not Found");
+  }
+
+  paste.viewsUsed += 1;
+  await paste.save();
+
+  res.setHeader("Content-Type", "text/html");
+  res.send(`<pre>${escapeHtml(paste.content)}</pre>`);
+});
+
 /* =======================
    SERVER START
    ======================= */
@@ -70,3 +101,4 @@ app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📡 API URL: http://localhost:${PORT}/api`);
 });
+
