@@ -28,13 +28,21 @@ router.post("/pastes", (req, res) => {
 
   pastes.unshift(paste);
 
-  res.status(201).json({
-    success: true,
-    data: paste,
-  url: `http://localhost:3000/paste/${paste._id}`
+ 
+const baseUrl =
+  process.env.NODE_ENV === "production"
+    ? "https://paste-bin-ploi.vercel.app"
+    : "http://localhost:3000";
+
+res.status(201).json({
+  success: true,
+  data: paste,
+  url: `${baseUrl}/paste/${paste._id}`
+});
+
 
   });
-});
+
 
 // Get recent pastes
 router.get("/pastes", (req, res) => {
