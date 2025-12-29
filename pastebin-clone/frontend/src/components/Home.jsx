@@ -25,10 +25,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import axios from 'axios';
 
-const API_URL =
-  window.location.hostname === 'localhost'
-    ? 'http://localhost:5000/api'
-    : 'https://paste-binn.onrender.com/api';
+import API_URL from '../config';
+
 
 console.log("API_URL =", API_URL);
 

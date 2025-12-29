@@ -26,10 +26,8 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import axios from 'axios';
 
-const API_URL =
-  window.location.hostname === 'localhost'
-    ? 'http://localhost:5000/api'
-    : 'https://paste-binn.onrender.com/api';
+import API_URL from '../config';
+const response = await axios.get(`${API_URL}/pastes/${id}`);
 
 
 const ViewPaste = () => {
