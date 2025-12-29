@@ -2,6 +2,7 @@
 const cors = require("cors");
 const dotenv = require("dotenv");
 const pasteRoutes = require("./routes/pasteRoutes");
+const mongoose = require("mongoose");
 
 // Load environment variables
 dotenv.config();
@@ -33,7 +34,10 @@ app.use((err, req, res, next) => {
     error: err.message
   });
 });
-
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("✅ MongoDB connected"))
+  .catch((err) => console.error("❌ MongoDB connection error:", err));
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
