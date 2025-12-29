@@ -2,113 +2,72 @@ const express = require("express");
 const router = express.Router();
 const Paste = require("../models/Paste");
 
-function now(req) {
-  if (process.env.TEST_MODE === "1" && req.headers["x-test-now-ms"]) {
-    return Number(req.headers["x-test-now-ms"]);
-  }
-  return Date.now();
-}
-
-router.post("/pastes", async (req, res) => {
+/* CREATE PASTE */
+router.post("/", async (req, res) => {
   try {
-    const { content, ttl_seconds, max_views } = req.body;
+    const { content, title, language } = req.body;
 
-    if (!content || typeof content !== "string" || !content.trim()) {
-      return res.status(400).json({ error: "Invalid content" });
+    if (!content || !content.trim()) {
+      return res.status(400).json({ success: false, message: "Content required" });
     }
-
-    if (
-      ttl_seconds !== undefined &&
-      (!Number.isInteger(ttl_seconds) || ttl_seconds < 1)
-    ) {
-      return res.status(400).json({ error: "Invalid ttl_seconds" });
-    }
-
-    if (
-      max_views !== undefined &&
-      (!Number.isInteger(max_views) || max_views < 1)
-    ) {
-      return res.status(400).json({ error: "Invalid max_views" });
-    }
-
-    const expiresAt = ttl_seconds
-      ? new Date(now(req) + ttl_seconds * 1000)
-      : null;
 
     const paste = await Paste.create({
+      title: title || "Untitled",
       content,
-      expiresAt,
-      maxViews: max_views ?? null,
+      language: language || "text",
       viewsUsed: 0,
     });
 
     res.status(201).json({
-      id: paste._id.toString(),
-      url: `${process.env.FRONTEND_URL}/p/${paste._id}`,
+      success: true,
+      data: paste,
+      url: `${process.env.FRONTEND_URL}/paste/${paste._id}`,
     });
   } catch (err) {
-    console.error("Create paste error:", err);
-    res.status(500).json({ error: "Internal server error" });
+    console.error(err);
+    res.status(500).json({ success: false, message: "Server error" });
   }
 });
 
-
-// Get recent pastes (for home page)
+/* GET RECENT PASTES */
 router.get("/", async (req, res) => {
   try {
     const pastes = await Paste.find()
       .sort({ createdAt: -1 })
-      .limit(20)
-      .select('_id content createdAt viewsUsed');
-    
-    const formattedPastes = pastes.map(paste => ({
-      _id: paste._id,
-      title: paste.content.substring(0, 50) + (paste.content.length > 50 ? '...' : ''),
-      language: 'javascript',
-      views: paste.viewsUsed || 0,
-      createdAt: paste.createdAt
-    }));
+      .limit(20);
 
-    res.status(200).json({
+    res.json({
       success: true,
-      data: formattedPastes
+      data: pastes.map(p => ({
+        _id: p._id,
+        title: p.title,
+        language: p.language,
+        views: p.viewsUsed || 0,
+        createdAt: p.createdAt
+      }))
     });
   } catch (err) {
-    console.error('Fetch pastes error:', err);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ success: false });
   }
 });
-router.get("/pastes/:id", async (req, res) => {
+
+/* GET SINGLE PASTE */
+router.get("/:id", async (req, res) => {
   try {
     const paste = await Paste.findById(req.params.id);
     if (!paste) {
-      return res.status(404).json({ error: "Not found" });
-    }
-
-    const currentTime = now(req);
-
-    if (paste.expiresAt && currentTime > paste.expiresAt.getTime()) {
-      return res.status(404).json({ error: "Expired" });
-    }
-
-    if (paste.maxViews !== null && paste.viewsUsed >= paste.maxViews) {
-      return res.status(404).json({ error: "View limit exceeded" });
+      return res.status(404).json({ success: false, message: "Not found" });
     }
 
     paste.viewsUsed += 1;
     await paste.save();
 
-    res.status(200).json({
-      content: paste.content,
-      remaining_views:
-        paste.maxViews === null
-          ? null
-          : Math.max(0, paste.maxViews - paste.viewsUsed),
-      expires_at: paste.expiresAt,
+    res.json({
+      success: true,
+      data: paste
     });
   } catch (err) {
-    console.error("Fetch paste error:", err);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ success: false });
   }
 });
 
