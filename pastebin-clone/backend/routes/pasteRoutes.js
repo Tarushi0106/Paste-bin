@@ -2,10 +2,10 @@ const express = require("express");
 const router = express.Router();
 const { randomUUID } = require("crypto");
 
-// 🔥 TEMP IN-MEMORY STORAGE
+
 let pastes = [];
 
-// Create a new paste
+
 router.post("/pastes", async (req, res) => {
   const { content, ttl_seconds, max_views } = req.body;
 
@@ -37,9 +37,6 @@ router.post("/pastes", async (req, res) => {
   });
 });
 
-
-
-// Get recent pastes
 router.get("/pastes", (req, res) => {
   res.json({
     success: true,
@@ -53,7 +50,7 @@ router.get("/pastes", (req, res) => {
   });
 });
 
-// Get paste by ID
+
 router.get("/pastes/:id", async (req, res) => {
   const paste = await Paste.findById(req.params.id);
   if (!paste) return res.status(404).json({ error: "Not found" });

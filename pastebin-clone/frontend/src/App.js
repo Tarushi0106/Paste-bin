@@ -1,15 +1,14 @@
-// frontend/src/App.js
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, CssBaseline, Box, Container, createTheme } from '@mui/material';
 import './styles.css';
 
-// Import your components
+
 import Home from './components/Home';
 import CreatePaste from './components/CreatePaste';
 import ViewPaste from './components/ViewPaste';
 
-// Create a proper Material-UI theme
 const theme = createTheme({
   palette: {
     mode: 'dark',
@@ -82,7 +81,6 @@ const theme = createTheme({
   },
 });
 
-// Simple Navigation Component
 const Navigation = () => {
   return (
     <Box sx={{ 

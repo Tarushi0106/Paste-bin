@@ -63,7 +63,6 @@ const ViewPaste = () => {
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
-    // You could add a toast notification here
   };
 
   const getLanguageName = (lang) => {
@@ -212,7 +211,7 @@ const ViewPaste = () => {
 
       <Box mt={4}>
         <Typography variant="h6" gutterBottom color="primary">
-          📋 Want to create your own paste?
+           Want to create your own paste?
         </Typography>
         <Button
           variant="contained"

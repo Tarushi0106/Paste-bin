@@ -75,7 +75,6 @@ const CreatePaste = () => {
         setSuccess('Paste created successfully!');
         setPasteUrl(response.data.url);
         
-        // Reset form
         setFormData({
           title: '',
           content: '',
@@ -92,7 +91,6 @@ const CreatePaste = () => {
   const copyToClipboard = () => {
     if (pasteUrl) {
       navigator.clipboard.writeText(pasteUrl);
-      // You could add a toast notification here
     }
   };
 

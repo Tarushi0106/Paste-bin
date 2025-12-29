@@ -4,14 +4,10 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const pasteRoutes = require("./routes/pasteRoutes");
 
-// Load environment variables
 dotenv.config();
 
 const app = express();
 
-/* =======================
-   CORS CONFIG (FIXED)
-   ======================= */
 app.use(cors({
   origin: [
     "http://localhost:3000",
@@ -20,18 +16,11 @@ app.use(cors({
   methods: ["GET", "POST", "PUT", "DELETE"],
 }));
 
-/* =======================
-   MIDDLEWARE
-   ======================= */
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-/* =======================
-   ROUTES
-   ======================= */
-app.use("/api", pasteRoutes);
 
-// Health check
+app.use("/api", pasteRoutes);
 
 app.get("/api/healthz", async (req, res) => {
   try {
@@ -42,9 +31,6 @@ app.get("/api/healthz", async (req, res) => {
   }
 });
 
-/* =======================
-   GLOBAL ERROR HANDLER
-   ======================= */
 app.use((err, req, res, next) => {
   console.error("🔥 Error:", err.message);
   res.status(500).json({
@@ -53,9 +39,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-/* =======================
-   MONGODB CONNECTION
-   ======================= */
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB connected"))
@@ -92,13 +75,10 @@ app.get("/p/:id", async (req, res) => {
   res.send(`<pre>${escapeHtml(paste.content)}</pre>`);
 });
 
-/* =======================
-   SERVER START
-   ======================= */
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📡 API URL: http://localhost:${PORT}/api`);
+  console.log(` Server running on port ${PORT}`);
+  console.log(` API URL: http://localhost:${PORT}/api`);
 });
 

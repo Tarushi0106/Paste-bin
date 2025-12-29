@@ -1,4 +1,4 @@
-// theme.js
+
 import { createTheme } from '@mui/material/styles';
 
 const professionalTheme = createTheme({

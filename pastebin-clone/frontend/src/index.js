@@ -1,7 +1,7 @@
-// index.js
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './styles.css'; // Import CSS here
+import './styles.css'; 
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
