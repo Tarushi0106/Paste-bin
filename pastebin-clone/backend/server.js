@@ -1,5 +1,4 @@
 ﻿const express = require("express");
-const cors = require("cors");
 const dotenv = require("dotenv");
 const pasteRoutes = require("./routes/pasteRoutes");
 const mongoose = require("mongoose");
@@ -10,10 +9,27 @@ dotenv.config();
 const app = express();
 
 // Middleware
+const cors = require('cors');
+
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://paste-bin-ploi.vercel.app'
+];
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || "http://localhost:3000",
+  origin: function (origin, callback) {
+    // allow requests with no origin (like Postman)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
