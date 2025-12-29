@@ -24,7 +24,11 @@ import {
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL;
+const API_URL =
+  window.location.hostname === 'localhost'
+    ? 'http://localhost:5000/api'
+    : 'https://paste-binn.onrender.com/api';
+
 
 const languageOptions = [
   'text', 'javascript', 'python', 'java', 'cpp', 'c', 'csharp',
