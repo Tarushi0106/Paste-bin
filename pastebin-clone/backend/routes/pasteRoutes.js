@@ -52,6 +52,32 @@ router.post("/pastes", async (req, res) => {
   }
 });
 
+
+// Get recent pastes (for home page)
+router.get("/", async (req, res) => {
+  try {
+    const pastes = await Paste.find()
+      .sort({ createdAt: -1 })
+      .limit(20)
+      .select('_id content createdAt viewsUsed');
+    
+    const formattedPastes = pastes.map(paste => ({
+      _id: paste._id,
+      title: paste.content.substring(0, 50) + (paste.content.length > 50 ? '...' : ''),
+      language: 'javascript',
+      views: paste.viewsUsed || 0,
+      createdAt: paste.createdAt
+    }));
+
+    res.status(200).json({
+      success: true,
+      data: formattedPastes
+    });
+  } catch (err) {
+    console.error('Fetch pastes error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 router.get("/pastes/:id", async (req, res) => {
   try {
     const paste = await Paste.findById(req.params.id);
