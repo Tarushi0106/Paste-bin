@@ -1,11 +1,16 @@
 const express = require("express");
 const router = express.Router();
-const { randomUUID } = require("crypto");
+const Paste = require("../models/Paste");
 
+/* -------- helper: deterministic time -------- */
+function now(req) {
+  if (process.env.TEST_MODE === "1" && req.headers["x-test-now-ms"]) {
+    return Number(req.headers["x-test-now-ms"]);
+  }
+  return Date.now();
+}
 
-let pastes = [];
-
-
+/* -------- CREATE PASTE -------- */
 router.post("/pastes", async (req, res) => {
   const { content, ttl_seconds, max_views } = req.body;
 
@@ -22,35 +27,23 @@ router.post("/pastes", async (req, res) => {
   }
 
   const expiresAt = ttl_seconds
-    ? new Date(Date.now() + ttl_seconds * 1000)
+    ? new Date(now(req) + ttl_seconds * 1000)
     : null;
 
   const paste = await Paste.create({
     content,
     expiresAt,
     maxViews: max_views ?? null,
+    viewsUsed: 0
   });
 
   res.status(201).json({
     id: paste._id.toString(),
-    url: `${process.env.PUBLIC_BASE_URL}/p/${paste._id}`
+    url: `${process.env.FRONTEND_URL}/p/${paste._id}`
   });
 });
 
-router.get("/pastes", (req, res) => {
-  res.json({
-    success: true,
-    data: pastes.slice(0, 10).map(p => ({
-      _id: p._id,
-      title: p.title,
-      language: p.language,
-      createdAt: p.createdAt,
-      views: p.views
-    }))
-  });
-});
-
-
+/* -------- FETCH PASTE (API) -------- */
 router.get("/pastes/:id", async (req, res) => {
   const paste = await Paste.findById(req.params.id);
   if (!paste) return res.status(404).json({ error: "Not found" });
@@ -71,10 +64,11 @@ router.get("/pastes/:id", async (req, res) => {
   res.json({
     content: paste.content,
     remaining_views:
-      paste.maxViews === null ? null : paste.maxViews - paste.viewsUsed,
+      paste.maxViews === null
+        ? null
+        : Math.max(0, paste.maxViews - paste.viewsUsed),
     expires_at: paste.expiresAt
   });
 });
-
 
 module.exports = router;
