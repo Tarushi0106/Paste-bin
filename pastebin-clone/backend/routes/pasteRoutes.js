@@ -3,7 +3,8 @@ const router = express.Router();
 const Paste = require("../models/Paste");
 
 /* CREATE PASTE */
-router.post("/", async (req, res) => {
+router.post("/pastes", async (req, res) => {
+
   try {
     const { content, title, language } = req.body;
 
