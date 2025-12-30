@@ -30,7 +30,7 @@ router.post("/", async (req, res) => {
 });
 
 /* GET RECENT PASTES */
-router.get("/", async (req, res) => {
+router.get("/pastes", async (req, res) => {
   try {
     const pastes = await Paste.find()
       .sort({ createdAt: -1 })
@@ -38,18 +38,13 @@ router.get("/", async (req, res) => {
 
     res.json({
       success: true,
-      data: pastes.map(p => ({
-        _id: p._id,
-        title: p.title,
-        language: p.language,
-        views: p.viewsUsed || 0,
-        createdAt: p.createdAt
-      }))
+      data: pastes
     });
   } catch (err) {
     res.status(500).json({ success: false });
   }
 });
+
 
 /* GET SINGLE PASTE */
 router.get("/:id", async (req, res) => {
