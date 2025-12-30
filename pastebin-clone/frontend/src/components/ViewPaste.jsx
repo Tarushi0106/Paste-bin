@@ -65,9 +65,9 @@ const ViewPaste = () => {
     navigator.clipboard.writeText(text);
   };
 
-  const getLanguageName = (lang) => {
-    return lang.charAt(0).toUpperCase() + lang.slice(1);
-  };
+const getLanguageName = (lang) =>
+  (lang || 'text').charAt(0).toUpperCase() + (lang || 'text').slice(1);
+
 
   if (loading) {
     return (
