@@ -46,7 +46,8 @@ const ViewPaste = () => {
   const fetchPaste = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_URL}/pastes/${id}`);
+      const response = await axios.get(`${API_URL}/${id}`);
+
       
       if (response.data.success) {
         setPaste(response.data.data);
