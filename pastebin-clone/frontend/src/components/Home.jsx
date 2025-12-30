@@ -63,12 +63,10 @@ const Home = () => {
     setSearchTerm(e.target.value);
   };
 
-(paste.title || '')
-  .toLowerCase()
-  .includes(searchTerm.toLowerCase()) ||
-(paste.language || '')
-  .toLowerCase()
-  .includes(searchTerm.toLowerCase())
+const filteredPastes = recentPastes.filter(paste =>
+  (paste.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+  (paste.language || '').toLowerCase().includes(searchTerm.toLowerCase())
+);
 
 
   const copyToClipboard = (id) => {
