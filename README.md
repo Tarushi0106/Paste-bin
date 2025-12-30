@@ -1,72 +1,79 @@
 Pastebin-Lite
 
-Pastebin-Lite is a lightweight web application that allows users to create and share text pastes via a public URL. Each paste can optionally include constraints such as a time-to-live (TTL) or a maximum number of views, after which the paste becomes unavailable. The project is designed to be simple, reliable, and compatible with automated testing environments.
+A simple Pastebin-like app where users can create text pastes and share them via a link.
+Pastes can expire based on time (TTL) and/or a maximum number of views.
+
+This project is built to be reliable, minimal, and compatible with automated evaluation.
 
 Features
 
-Create & Share Pastes Users can create text-based pastes and receive a unique, shareable URL.
+Create a text paste
 
-Optional Constraints Pastes may include a time-based expiration (TTL) and/or a maximum view count. A paste becomes unavailable once any constraint is triggered.
+Get a shareable URL
 
-Persistent Storage All pastes are stored using a persistent database, ensuring data survives restarts and serverless deployments.
+View pastes via API or browser
 
-Deterministic Expiry Testing Supports deterministic time-based testing using request headers, enabling reliable automated grading.
+Optional expiry:
 
-Health Check Endpoint Provides an API endpoint to verify application and database availability.
+Time-to-live (TTL)
+
+View-count limit
+
+Safe rendering (no script execution)
+
+Deterministic time support for testing
 
 Tech Stack
 
-Frontend: React (deployed on Vercel)
+Frontend: React (Vite)
 
-Backend: Node.js with Express (deployed on Render)
+Backend: Node.js (Express)
 
 Database: MongoDB Atlas
 
-Running the Project Locally
+Deployment: Vercel (frontend) + Node backend
 
-Clone the Repository git clone
+Deployed App
 
-Backend Setup cd backend npm install
+URL: https://your-app.vercel.app
 
-Create a .env file in the backend directory with the following values:
+Paste URL format: https://your-app.vercel.app/p/:id
 
-PORT=5000 MONGO_URI=your_mongo_connection_string NODE_ENV=development
+Persistence
 
-Start the backend server:
+MongoDB Atlas is used to persist pastes.
+This ensures data survives across requests and works correctly in serverless environments.
 
+Running Locally
+1. Clone the repo
+git clone https://github.com/your-username/pastebin-lite.git
+cd pastebin-lite
+
+2. Install dependencies
+cd backend && npm install
+cd ../frontend && npm install
+
+3. Environment variables (backend)
+
+Create a .env file:
+
+PORT=5000
+MONGODB_URI=your_mongodb_uri
+TEST_MODE=0
+
+4. Start the app
+# backend
 npm start
 
-The backend will run on http://localhost:5000.
+# frontend
+npm run dev
 
-Frontend Setup cd frontend npm install npm start
-The frontend will be available at:
+Notes
 
-http://localhost:3000
+View counts are enforced atomically to avoid negative values
 
-Persistence Layer
+Pastes return 404 once expired or view limit is exceeded
 
-This application uses MongoDB Atlas as its persistence layer. MongoDB was chosen to ensure data reliability, durability across requests, and compatibility with serverless deployment environments where in-memory storage is insufficient.
+When TEST_MODE=1 is set, the x-test-now-ms header is used for TTL checks
 
-Health Check
-
-Endpoint: GET /api/healthz
-
-Response: Returns HTTP 200 with JSON:
-
-{ "ok": true }
-
-Confirms that both the application and database are reachable.
-
-Design Decisions
-
-Frontend and backend are deployed separately to allow independent scaling and simpler deployments.
-
-MongoDB was selected for persistence to meet automated testing and serverless requirements.
-
-Deterministic expiry testing was implemented using request headers to support reliable automated evaluation.
-
-The repository contains no hardcoded localhost URLs, secrets, or credentials.
-
-Author
-
-Tarushi Chaudhary
+No hardcoded localhost URLs or secrets are committed
