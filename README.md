@@ -31,8 +31,8 @@ This project is designed to be simple, reliable, and compatible with automated g
 
 ## Deployed App
 
-- **App URL:** https://your-app.vercel.app  
-- **Paste URL format:** https://your-app.vercel.app/p/:id  
+- **App URL:** https://paste-bin-ploi.vercel.app/
+
 
 ---
 
