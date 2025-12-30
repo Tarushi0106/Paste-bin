@@ -31,6 +31,7 @@ router.post("/", async (req, res) => {
 
 /* GET RECENT PASTES */
 router.get("/pastes", async (req, res) => {
+
   try {
     const pastes = await Paste.find()
       .sort({ createdAt: -1 })
