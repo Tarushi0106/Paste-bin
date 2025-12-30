@@ -32,8 +32,6 @@ const API_URL =
     : 'https://paste-binn.onrender.com/api';
 
 
-
-
 const ViewPaste = () => {
   const { id } = useParams();
   const navigate = useNavigate();
